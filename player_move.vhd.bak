@@ -1,0 +1,36 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity player_move is
+	port(
+		clk : in std_logic; -- A 50MHz clock
+		player1_coord : in std_logic_vector(6 downto 0);
+		
+		player1_boundary : out std_logic
+	);  
+end collision_detect;
+
+
+architecture behavioural of collision_detect is
+begin
+	process(clk)
+	
+	constant UPPER_BOUND : unsigned(6 downto 0) := to_unsigned(10,7);				--6 is the size of the unsigned
+	constant LOWER_BOUND : unsigned(6 downto 0) := to_unsigned(109,7);
+	variable player1_upper : unsigned(6 downto 0) := unsigned(player1_coord);
+	variable player1_lower : unsigned(6 downto 0);
+	
+	begin
+		if(rising_edge(clk)) then
+			player1_lower := player1_upper - 9;						--initializes the size of player1
+		
+			if((player1_upper = UPPER_BOUND) OR (player1_lower = LOWER_BOUND)) then
+				player1_boundary <= '1';
+			else
+				player1_boundary <= '0';
+			end if;
+		end if;
+	end process;
+		
+end behavioural;

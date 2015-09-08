@@ -1,0 +1,36 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity write7seg is
+	port(
+		disp : in std_logic_vector(3 downto 0);  
+		-- 7-segment display
+		seg7 : out std_logic_vector(6 downto 0)
+	);  
+end write7seg ;
+
+
+architecture behavioural of write7seg is
+begin
+
+	process(disp)
+	begin
+
+		case disp is
+			when "0000" => seg7 <= "1000000";
+			when "0001" => seg7 <= "1111001";
+			when "0010" => seg7 <= "0100100";
+			when "0011" => seg7 <= "0110000";            
+			when "0100" => seg7 <= "0011001";
+			when "0101" => seg7 <= "0010010";
+			when "0110" => seg7 <= "0000010";
+			when "0111" => seg7 <= "1111000" ;
+			when "1000" => seg7 <= "0000000" ;
+			when "1001" => seg7 <= "0010000" ;
+			when others => seg7 <= "1111111";
+		end case;
+
+	end process;
+	
+end behavioural;

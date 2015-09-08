@@ -1,0 +1,91 @@
+library IEEE;
+use ieee.std_logic_1164.all;
+
+entity fsm is
+	port( clock: in std_logic;
+			nextStep: in std_logic;
+			reset: in std_logic;
+			done : in std_logic;
+			x0: out std_logic_vector( 7 downto 0 );
+			y0: out std_logic_vector( 6 downto 0);
+			mode: out std_logic_vector(1 downto 0) -- 0 = erase, 1 = idle, 2 = drawLine
+		);
+end entity;
+
+
+architecture behavioural of fsm is	
+	
+	signal nextStep_pulse : std_logic;
+begin
+
+		process(clock) 
+			type button_fsm is (idle,triggered);
+			variable button_state : button_fsm := idle;
+		begin
+			if(falling_edge(clock)) then
+				case button_state is
+					when idle =>
+						nextStep_pulse <= '0';
+						button_state := idle;
+						if (nextStep = '0') then
+							nextStep_pulse <= '1';
+							button_state := triggered;
+							
+						end if;
+						
+					when triggered =>
+						nextStep_pulse <= '0';
+						button_state := triggered;
+						if (nextStep = '1') then
+							nextStep_pulse <= '0';
+							button_state := idle;
+						end if;
+				end case;
+			end if;
+		end process;
+							
+process(clock, reset)
+
+--Initialize state_types and PRESENT_STATE
+type state_types is (Reset_State1, Reset_State2, Erase, Idle, Draw);
+variable PRESENT_STATE : state_types := Reset_State1;
+variable NEXT_STATE : state_types;
+
+	begin
+		if( reset = '0') then
+			x0 <= "00000000";
+			y0 <= "0000000";
+			mode <= "00";
+			NEXT_STATE := Reset_State1;
+			PRESENT_STATE := Reset_State1;
+			
+		elsif(rising_edge(clock)) then
+			-- map out state changes
+			case PRESENT_STATE is
+				when Reset_State1 => --00
+					mode <= "00";
+					NEXT_STATE := Reset_State2;
+				when Reset_State2 =>
+					mode <= "01";
+					NEXT_STATE := Erase;
+				
+				when Erase => --01
+					if (done = '1') then
+						NEXT_STATE := Idle;
+						mode <= "10";
+					end if;
+				when Idle => --10
+					if(nextStep_pulse = '1') then
+						NEXT_STATE := Draw;
+						mode <= "11";
+					end if;
+				when Draw => --11
+					if (done = '1') then
+						NEXT_STATE := Idle;
+						mode <= "10";
+					end if;
+			end case;
+			PRESENT_STATE := NEXT_STATE;
+		end if;
+	end process;
+end behavioural;

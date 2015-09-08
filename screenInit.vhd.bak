@@ -1,0 +1,54 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+entity screenInit is
+	port(		clk		: in std_logic;
+			x		: out std_logic_vector(7 downto 0);
+			y		: out std_logic_vector(6 downto 0);
+		
+			colour	: out std_logic_vector(2 downto 0);
+			plot		: out std_logic
+	);
+end screenInit;
+	
+architecture behavioural of screenInit is
+begin
+	variable x_temp0: std_logic_vector(7 downto 0) := "00000000";
+	variable y_temp0: std_logic_vector(6 downto 0) := "0000000";
+
+		if(rising_edge(clk)) then
+			
+			--initialize
+
+			if ( y_temp0 < 120 ) then
+
+				if ( x_temp0 < 160 ) then
+					x_temp0 := x_temp0 + 1;
+					
+					-- check colour
+					if ( y_temp0 >= 0 AND y < 10 ) then
+						colour <= "010";
+					elsif ( y_temp0 >= 110 AND y < 120 ) then
+						colour <= "010";
+					elsif ( x_temp0 >= 0 AND x < 10) then
+						colour <= "011";
+					elsif ( x_temp0 >= 150 AND x < 160 ) then
+						colour <= "011";
+					else
+						colour <= "000";
+					end if;
+
+				else
+					y_temp0 :=  y_temp0 + 1;
+				x_temp0 := "000000000";	
+				end if;
+
+				--plot pixel
+			       plot <= not clock;
+			x <= std_logic_vector(x_temp0(7 downto 0));
+			y <= std_logic_vector(y_temp0(6 downto 0));
+
+			end if;
+		end if;
+end process;
+end architecture;

@@ -1,0 +1,20 @@
+
+State Machine - |lab5_pong|lab5_fsm:U0|PRESENT_STATE
+Name PRESENT_STATE.end_game PRESENT_STATE.winner_state PRESENT_STATE.score_state PRESENT_STATE.play_state PRESENT_STATE.idle_state PRESENT_STATE.soft_reset_state PRESENT_STATE.reset_state 
+PRESENT_STATE.reset_state 0 0 0 0 0 0 0 
+PRESENT_STATE.soft_reset_state 0 0 0 0 0 1 1 
+PRESENT_STATE.idle_state 0 0 0 0 1 0 1 
+PRESENT_STATE.play_state 0 0 0 1 0 0 1 
+PRESENT_STATE.score_state 0 0 1 0 0 0 1 
+PRESENT_STATE.winner_state 0 1 0 0 0 0 1 
+PRESENT_STATE.end_game 1 0 0 0 0 0 1 
+
+State Machine - |lab5_pong|lab5_fsm:U0|NEXT_STATE
+Name NEXT_STATE.end_game NEXT_STATE.winner_state NEXT_STATE.score_state NEXT_STATE.play_state NEXT_STATE.idle_state NEXT_STATE.soft_reset_state NEXT_STATE.reset_state 
+NEXT_STATE.reset_state 0 0 0 0 0 0 0 
+NEXT_STATE.soft_reset_state 0 0 0 0 0 1 1 
+NEXT_STATE.idle_state 0 0 0 0 1 0 1 
+NEXT_STATE.play_state 0 0 0 1 0 0 1 
+NEXT_STATE.score_state 0 0 1 0 0 0 1 
+NEXT_STATE.winner_state 0 1 0 0 0 0 1 
+NEXT_STATE.end_game 1 0 0 0 0 0 1 

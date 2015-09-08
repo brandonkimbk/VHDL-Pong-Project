@@ -1,0 +1,130 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+
+entity DataPath is
+	PORT(
+		clock : IN std_logic;
+		
+		
+		colour   : out  std_logic_vector(2 downto 0);
+      x        : out  std_logic_vector(7 downto 0);
+      y        : out  std_logic_vector(6 downto 0);
+		plot		: out std_logic
+	);
+END entity;
+
+ARCHITECTURE Behavioural of DataPath is
+	
+begin	
+	
+	process(clock)
+		variable x_temp0: signed(8 downto 0) := signed('0' & std_logic_vector(x0));
+		variable y_temp0: signed(7 downto 0) := signed('0' & std_logic_vector(y0));
+		variable x_temp1:	signed(8 downto 0) := signed('0' & std_logic_vector(x1));
+		variable y_temp1: signed(7 downto 0) := signed('0' & std_logic_vector(y1));
+		variable dx : signed(8 downto 0) := "000000000";
+		variable dy : signed(7 downto 0) := "00000000";
+		variable sx : signed(8 downto 0) := "000000000";
+		variable sy : signed(7 downto 0) := "00000000";
+		variable err: signed(8 downto 0) := "000000000";
+		variable e2 : signed(17 downto 0) := "000000000000000000";
+		variable loop_check : std_logic := '0';
+		
+	begin
+		if(rising_edge(clock)) then
+			if(mode = "00") then
+				x_temp0 := "000000000";
+				y_temp0 := "00000000";
+				x_temp1 := signed('0' & std_logic_vector(x1));
+				y_temp1 := signed('0' & std_logic_vector(y1));
+				loop_check := '0';
+				done  <= '0';
+				
+			elsif(mode = "01") then					-- ERASE
+				if(y_temp0 < 120) then
+					if(x_temp0 < 160) then
+						x_temp0 := x_temp0 + 1;
+					else
+						y_temp0 :=  y_temp0 + 1;
+						x_temp0 := "000000000";
+					end if;
+					colour <= "000";
+					plot <= not clock;
+					x <= std_logic_vector(x_temp0(7 downto 0));	-- when it's not done
+					y <= std_logic_vector(y_temp0(6 downto 0));
+					
+				else 									-- means it's done
+					x_temp0 :=  "001010000";
+					y_temp0 :=  "00111100";
+					x_temp1 := signed('0' & std_logic_vector(x1));
+					y_temp1 := signed('0' & std_logic_vector(y1));
+					--dx :=  "000000000";
+					--dy :=  "00000000";
+					done <= '1';
+				end if;
+															-- end of clear screen
+			
+			elsif(mode = "10") then
+				done <= '0';
+				loop_check := '0';
+			
+			elsif(mode = "11") then					-- DRAW 
+				if(loop_check = '0') then
+					-- set dx and dy
+					x_temp1 :=	signed('0' & std_logic_vector(x1));
+					y_temp1 :=  signed('0' & std_logic_vector(y1));
+					dx := abs(signed(x_temp1) - signed(x_temp0));
+					dy := abs(signed(y_temp1) - signed(y_temp0));
+
+					-- set sx and sy
+					if(x_temp0 < x_temp1) then
+						sx := "000000001";
+					else
+						sx := "111111111";
+					end if;
+
+					if(y_temp0 < y_temp1) then
+						sy := "00000001";
+					 else
+						sy := "11111111";
+					end if;
+					err := dx-dy;
+					loop_check := '1';
+					done <= '0';
+					
+				else									-- LOOP
+					-- loop
+					if((x_temp0 = x_temp1) AND (y_temp0 = y_temp1)) then		--DONE
+						--x_temp0 :=  "001010000";
+						--y_temp0 :=  "00111100";
+						x_temp1 :=	signed('0' & std_logic_vector(x1));
+						y_temp1 :=  signed('0' & std_logic_vector(y1));
+						done <= '1';
+						
+					else
+						e2 := 2*err; --mult by 2
+						if(e2 > (-1*dy)) then
+							err := err - dy;
+							x_temp0 := x_temp0 + sx;
+						end if;
+
+						if(e2 < dx) then
+							err := err + dx;
+							y_temp0 := y_temp0 + sy;
+						end if;
+						
+						x <= std_logic_vector(x_temp0(7 downto 0));	-- when it's not done
+						y <= std_logic_vector(y_temp0(6 downto 0));
+						colour <= colour_sw;
+						plot <= not clock;
+						
+					end if;
+				end if;
+			end if;
+
+		end if;
+		
+	end process;
+end Behavioural;

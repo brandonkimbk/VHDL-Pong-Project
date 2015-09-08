@@ -1,0 +1,25 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity changeSpeed is
+	port( clk : in std_logic;
+		slowclock : out std_logic
+	);
+end changeSpeed;
+
+architecture behavioural of changeSpeed
+begin
+	process( clk ) 
+		variable: count integer := "0";
+		begin
+			if( falling_edge(clk) ) then
+				if( count < "50000000" ) then
+					count := count + 1;
+					slowclock <= '0';
+				elsif( count = "50000000") then
+					count := "0";
+					slowclock <= '1';
+			end if;
+	end process;
+end behavioural;

@@ -1,0 +1,30 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity collision_detect is
+	port(
+		clk : in std_logic; -- A 50MHz clock
+		dealt : out std_logic_vector(3 downto 0)
+	);  
+end collision_detect;
+
+
+architecture behavioural of collision_detect is
+begin
+	process(clk)
+		variable counter: unsigned(3 downto 0) := "0001";
+	
+	begin
+		if(rising_edge(clk)) then
+			if(counter < 13) then
+				counter := counter+1;
+			else
+				counter := "0001";
+			end if;
+			
+			dealt <= std_logic_vector(counter);
+		end if;
+	end process;
+		
+end behavioural;
